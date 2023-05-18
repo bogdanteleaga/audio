@@ -97,8 +97,8 @@ through MOS using non-matching references.” Interspeech, 2022.
 
  .. code-block:: none
 
-    2.1.0.dev20230517
-    2.1.0.dev20230517
+    2.1.0.dev20230518
+    2.1.0.dev20230518
 
 
 
@@ -231,7 +231,7 @@ plot data, pystoi, pesq for computing reference metrics.
 
  .. code-block:: none
 
-      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 71.2MB/s]
+      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 96.7MB/s]
 
 
 
@@ -633,7 +633,7 @@ Get the pre-trained ``SquimObjective``\ model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_objective_dns2020.pth" to /root/.cache/torch/hub/checkpoints/squim_objective_dns2020.pth
-      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 399MB/s]
+      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 415MB/s]
 
 
 
@@ -764,7 +764,7 @@ Get the pre-trained ``SquimSubjective`` model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/squim_subjective_bvcc_daps.pth" to /root/.cache/torch/hub/checkpoints/squim_subjective_bvcc_daps.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]     11%|#         | 38.7M/360M [00:00<00:00, 406MB/s]     22%|##1       | 78.3M/360M [00:00<00:00, 411MB/s]     33%|###2      | 118M/360M [00:00<00:00, 416MB/s]      44%|####4     | 159M/360M [00:00<00:00, 419MB/s]     55%|#####5    | 199M/360M [00:00<00:00, 420MB/s]     66%|######6   | 239M/360M [00:00<00:00, 420MB/s]     78%|#######7  | 279M/360M [00:00<00:00, 420MB/s]     89%|########8 | 320M/360M [00:00<00:00, 421MB/s]    100%|##########| 360M/360M [00:00<00:00, 421MB/s]    100%|##########| 360M/360M [00:00<00:00, 419MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]      3%|3         | 12.2M/360M [00:00<00:02, 128MB/s]      7%|6         | 25.2M/360M [00:00<00:02, 133MB/s]     17%|#7        | 62.3M/360M [00:00<00:01, 250MB/s]     28%|##7       | 101M/360M [00:00<00:00, 311MB/s]      39%|###8      | 140M/360M [00:00<00:00, 346MB/s]     50%|####9     | 179M/360M [00:00<00:00, 366MB/s]     60%|######    | 217M/360M [00:00<00:00, 378MB/s]     70%|#######   | 253M/360M [00:00<00:00, 379MB/s]     80%|########  | 290M/360M [00:00<00:00, 381MB/s]     91%|#########1| 329M/360M [00:01<00:00, 390MB/s]    100%|##########| 360M/360M [00:01<00:00, 350MB/s]
 
 
 
@@ -794,7 +794,7 @@ Load a non-matching reference (NMR)
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 135MB/s]
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 221MB/s]
 
 
 
@@ -897,7 +897,7 @@ represents the corresponding ground truth.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.948 seconds)
+   **Total running time of the script:** ( 0 minutes  6.809 seconds)
 
 
 .. _sphx_glr_download_tutorials_squim_tutorial.py:
