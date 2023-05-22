@@ -51,8 +51,8 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
  .. code-block:: none
 
-    2.1.0.dev20230521
-    2.1.0.dev20230521
+    2.1.0.dev20230522
+    2.1.0.dev20230522
 
 
 
@@ -860,7 +860,7 @@ Tag: :obj:`torchaudio.io`
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.189 seconds)
+   **Total running time of the script:** ( 0 minutes  17.492 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_advanced_tutorial.py:

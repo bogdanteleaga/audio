@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.functional &mdash; Torchaudio 2.1.0.dev20230521 documentation</title>
+  <title>torchaudio.functional.functional &mdash; Torchaudio 2.1.0.dev20230522 documentation</title>
   
 
   
@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230521 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230522 &#x25BC</span></a>
     </div>
     
 
@@ -3006,7 +3006,7 @@
     <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="o">=</span><span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="o">=</span><span class="n">b_coeffs</span><span class="p">)</span></div>
 
 
-<span class="nd">@fail_if_no_align</span>
+<div class="viewcode-block" id="forced_align"><a class="viewcode-back" href="../../../generated/torchaudio.functional.forced_align.html#torchaudio.functional.forced_align">[docs]</a><span class="nd">@fail_if_no_align</span>
 <span class="k">def</span> <span class="nf">forced_align</span><span class="p">(</span>
     <span class="n">log_probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -3043,7 +3043,7 @@
     <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;targets values must be less than the CTC dimension&quot;</span><span class="p">)</span>
     <span class="n">paths</span><span class="p">,</span> <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">forced_align</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">blank</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">paths</span><span class="p">,</span> <span class="n">scores</span>
+    <span class="k">return</span> <span class="n">paths</span><span class="p">,</span> <span class="n">scores</span></div>
 </pre></div>
 
              </article>
