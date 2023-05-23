@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.forced_align &mdash; Torchaudio 2.1.0.dev20230522 documentation</title>
+  <title>torchaudio.functional.forced_align &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
   
 
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230522 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
     </div>
     
 
@@ -278,6 +278,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -416,22 +417,25 @@
 <dt class="sig sig-object py" id="torchaudio.functional.forced_align">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></span><span class="sig-name descname"><span class="pre">forced_align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_probs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">blank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/functional/functional.html#forced_align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.forced_align" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes forced alignment given the emissions from a CTC-trained model and a target label.</p>
+<a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="../_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
+<a class="reference external image-reference" href="../supported_features.html#properties"><img alt="This API supports the following properties: TorchScript" class="shield-badge" src="../_images/6f921ff5b3be21ecb1bc4c704713f340a88edbd1f97f2711e07a486d7b53dea2.svg" /></a>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>log_probs</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – log probability of CTC emission output.
-Tensor with dimensions <cite>(T, C)</cite>. where <cite>T</cite> is the input length,
-vocabulary is the number of characters in alphabet including blank.</p></li>
-<li><p><strong>targets</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Target sequence. Tensor with dimension <cite>(L,)</cite>,
+Tensor of shape <cite>(T, C)</cite>. where <cite>T</cite> is the input length,
+<cite>C</cite> is the number of characters in alphabet including blank.</p></li>
+<li><p><strong>targets</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Target sequence. Tensor of shape <cite>(L,)</cite>,
 where <cite>L</cite> is the target length.</p></li>
-<li><p><strong>input_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the inputs (max value must each be &lt;= <cite>T</cite>). Tensor with dimension <cite>()</cite>.</p></li>
-<li><p><strong>target_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the targets. Tensor with dimension <cite>()</cite>.</p></li>
+<li><p><strong>input_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the inputs (max value must each be &lt;= <cite>T</cite>). 0-D Tensor (scalar).</p></li>
+<li><p><strong>target_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the targets. 0-D Tensor (scalar).</p></li>
 <li><p><strong>blank_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The index of blank symbol in CTC emission. (Default: 0)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>torch.Tensor: Label for each time step in the alignemnt path computed using forced alignment.
-torch.Tensor: Log probability scores of the labels for each time step.</p>
+<dd class="field-even"><p><p>torch.Tensor: Label for each time step in the alignment path computed using forced alignment.</p>
+<p>torch.Tensor: Log probability scores of the labels for each time step.</p>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Tuple(<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)">torch.Tensor</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)">torch.Tensor</a>)</p>
@@ -439,14 +443,20 @@ torch.Tensor: Log probability scores of the labels for each time step.</p>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The sequence length of <cite>log_probs</cite> must satisfy:
-.. math:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">L_</span><span class="p">{</span>\<span class="n">text</span><span class="p">{</span><span class="n">log_probs</span><span class="p">}}</span> \<span class="n">ge</span> <span class="n">L_</span><span class="p">{</span>\<span class="n">text</span><span class="p">{</span><span class="n">label</span><span class="p">}}</span> <span class="o">+</span> <span class="n">N_</span><span class="p">{</span>\<span class="n">text</span><span class="p">{</span><span class="n">repeat</span><span class="p">}}</span>
-</pre></div>
-</div>
+<p>The sequence length of <cite>log_probs</cite> must satisfy:</p>
+<div class="math">
+\[L_{\text{log\_probs}} \ge L_{\text{label}} + N_{\text{repeat}}
+
+\]</div>
 <p>where <span class="math">\(N_{\text{repeat}}\)</span> is the number of consecutively repeated tokens.
 For example, in str <cite>“aabbc”</cite>, the number of repeats are <cite>2</cite>.</p>
 </div>
+<dl>
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">forced_align</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__"><img alt="CTC forced alignment API tutorial" src="../_images/sphx_glr_ctc_forced_alignment_api_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html#sphx-glr-tutorials-ctc-forced-alignment-api-tutorial-py"><span class="std std-ref">CTC forced alignment API tutorial</span></a></p>
+  <div class="sphx-glr-thumbnail-title">CTC forced alignment API tutorial</div>
+</div></div></dd>
+</dl>
 </dd></dl>
 
 </section>
