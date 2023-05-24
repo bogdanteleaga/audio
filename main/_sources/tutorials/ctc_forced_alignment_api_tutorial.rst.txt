@@ -28,8 +28,7 @@ This tutorial shows how to align transcripts to speech with
 ``torchaudio``'s CTC forced alignment API proposed in the paper
 `“Scaling Speech Technology to 1,000+
 Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__,
-and two advanced usages, i.e. dealing with non-English data and
-transcription errors. 
+and one advanced usage, i.e. dealing with transcription errors with a <star> token.
 
 Though there’s some overlap in visualization
 diagrams, the scope here is different from the `“Forced Alignment with
@@ -38,7 +37,7 @@ tutorial, which focuses on a step-by-step demonstration of the forced
 alignment generation algorithm (without using an API) described in the
 `paper <https://arxiv.org/abs/2007.09127>`__ with a Wav2Vec2 model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-50
+.. GENERATED FROM PYTHON SOURCE LINES 22-45
 
 .. code-block:: default
 
@@ -61,13 +60,9 @@ alignment generation algorithm (without using an API) described in the
             "Failed to import the forced alignment API. "
             "Please install torchaudio nightly builds. "
             "Please refer to https://pytorch.org/get-started/locally "
-            "for instructions to install a nightly build.")
+            "for instructions to install a nightly build."
+        )
         raise
-
-    import matplotlib
-    import matplotlib.pyplot as plt
-    from IPython.display import Audio
-
 
 
 
@@ -77,17 +72,17 @@ alignment generation algorithm (without using an API) described in the
 
  .. code-block:: none
 
-    2.1.0.dev20230523
-    2.1.0.dev20230524
+    2.1.0.dev20230711
+    2.1.0.dev20230711
     cuda
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-63
+.. GENERATED FROM PYTHON SOURCE LINES 46-58
 
-I. Basic usages
----------------
+Basic usages
+------------
 
 In this section, we cover the following content:
 
@@ -99,7 +94,7 @@ In this section, we cover the following content:
 4. Obtain word-level alignments from token-level alignments.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-71
+.. GENERATED FROM PYTHON SOURCE LINES 61-66
 
 Preparation
 ~~~~~~~~~~~
@@ -107,14 +102,17 @@ Preparation
 First we import the necessary packages, and fetch data that we work on.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-84
+.. GENERATED FROM PYTHON SOURCE LINES 66-82
 
 .. code-block:: default
 
 
     # %matplotlib inline
     from dataclasses import dataclass
+
     import IPython
+    import matplotlib
+    import matplotlib.pyplot as plt
 
     matplotlib.rcParams["figure.figsize"] = [16.0, 4.8]
 
@@ -131,7 +129,7 @@ First we import the necessary packages, and fetch data that we work on.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-92
+.. GENERATED FROM PYTHON SOURCE LINES 83-90
 
 Generate frame-wise class posteriors from a CTC acoustic model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,7 +139,7 @@ of each audio frame using a CTC model.
 Here we use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-107
+.. GENERATED FROM PYTHON SOURCE LINES 90-105
 
 .. code-block:: default
 
@@ -154,7 +152,7 @@ Here we use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
         emissions, _ = model(waveform.to(device))
         emissions = torch.log_softmax(emissions, dim=-1)
 
-    emission = emissions[0].cpu().detach()
+    emission = emissions.cpu().detach()
     dictionary = {c: i for i, c in enumerate(labels)}
 
     print(dictionary)
@@ -168,23 +166,25 @@ Here we use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 
  .. code-block:: none
 
+    /work/ci_env/lib/python3.10/site-packages/torch/nn/utils/weight_norm.py:30: UserWarning: torch.nn.utils.weight_norm is deprecated in favor of torch.nn.utils.parametrizations.weight_norm.
+      warnings.warn("torch.nn.utils.weight_norm is deprecated in favor of torch.nn.utils.parametrizations.weight_norm.")
     {'-': 0, '|': 1, 'E': 2, 'T': 3, 'A': 4, 'O': 5, 'N': 6, 'I': 7, 'H': 8, 'S': 9, 'R': 10, 'D': 11, 'L': 12, 'U': 13, 'M': 14, 'W': 15, 'C': 16, 'F': 17, 'G': 18, 'Y': 19, 'P': 20, 'B': 21, 'V': 22, 'K': 23, "'": 24, 'X': 25, 'J': 26, 'Q': 27, 'Z': 28}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-111
+.. GENERATED FROM PYTHON SOURCE LINES 106-109
 
 Visualization
 ^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-120
+.. GENERATED FROM PYTHON SOURCE LINES 109-118
 
 .. code-block:: default
 
 
-    plt.imshow(emission.T)
+    plt.imshow(emission[0].T)
     plt.colorbar()
     plt.title("Frame-wise class probabilities")
     plt.xlabel("Time")
@@ -204,7 +204,7 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-195
+.. GENERATED FROM PYTHON SOURCE LINES 119-193
 
 Computing frame-level alignments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -281,12 +281,10 @@ From such information stored in the ``frames`` list, we’ll compute
 token-level and word-level alignments easily.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-240
+.. GENERATED FROM PYTHON SOURCE LINES 193-236
 
 .. code-block:: default
 
-
-    import torchaudio.functional as F
 
 
     @dataclass
@@ -302,27 +300,27 @@ token-level and word-level alignments easily.
         frames = []
         tokens = [dictionary[c] for c in transcript.replace(" ", "")]
 
-        targets = torch.tensor(tokens, dtype=torch.int32)
-        input_lengths = torch.tensor(emission.shape[0])
-        target_lengths = torch.tensor(targets.shape[0])
+        targets = torch.tensor(tokens, dtype=torch.int32).unsqueeze(0)
+        input_lengths = torch.tensor([emission.shape[1]])
+        target_lengths = torch.tensor([targets.shape[1]])
 
         # This is the key step, where we call the forced alignment API functional.forced_align to compute alignments.
-        frame_alignment, frame_scores = F.forced_align(emission, targets, input_lengths, target_lengths, 0)
+        frame_alignment, frame_scores = forced_align(emission, targets, input_lengths, target_lengths, 0)
 
-        assert len(frame_alignment) == input_lengths.item()
-        assert len(targets) == target_lengths.item()
+        assert frame_alignment.shape[1] == input_lengths[0].item()
+        assert targets.shape[1] == target_lengths[0].item()
 
         token_index = -1
         prev_hyp = 0
-        for i in range(len(frame_alignment)):
-            if frame_alignment[i].item() == 0:
+        for i in range(frame_alignment.shape[1]):
+            if frame_alignment[0][i].item() == 0:
                 prev_hyp = 0
                 continue
 
-            if frame_alignment[i].item() != prev_hyp:
+            if frame_alignment[0][i].item() != prev_hyp:
                 token_index += 1
-            frames.append(Frame(token_index, i, frame_scores[i].exp().item()))
-            prev_hyp = frame_alignment[i].item()
+            frames.append(Frame(token_index, i, frame_scores[0][i].exp().item()))
+            prev_hyp = frame_alignment[0][i].item()
         return frames, frame_alignment, frame_scores
 
 
@@ -337,13 +335,13 @@ token-level and word-level alignments easily.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-244
+.. GENERATED FROM PYTHON SOURCE LINES 237-240
 
 Obtain token-level alignments and confidence scores
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-257
+.. GENERATED FROM PYTHON SOURCE LINES 243-253
 
 The frame-level alignments contains repetations for the same labels.
 Another format “token-level alignment”, which specifies the aligned
@@ -356,9 +354,10 @@ scores by simply merging frame-level alignments and averaging
 frame-level confidence scores.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-301
+.. GENERATED FROM PYTHON SOURCE LINES 253-296
 
 .. code-block:: default
+
 
 
     # Merge the labels
@@ -385,8 +384,6 @@ frame-level confidence scores.
             while i2 < len(frames) and frames[i1].token_index == frames[i2].token_index:
                 i2 += 1
             score = sum(frames[k].score for k in range(i1, i2)) / (i2 - i1)
-            tokens = [dictionary[c] if c in dictionary else dictionary['@'] for c in transcript.replace(" ", "")]
-
             segments.append(
                 Segment(
                     transcript_nospace[frames[i1].token_index],
@@ -461,13 +458,13 @@ frame-level confidence scores.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 302-305
+.. GENERATED FROM PYTHON SOURCE LINES 297-300
 
 Visualization
 ^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-337
+.. GENERATED FROM PYTHON SOURCE LINES 300-332
 
 .. code-block:: default
 
@@ -515,7 +512,7 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 338-349
+.. GENERATED FROM PYTHON SOURCE LINES 333-344
 
 From the visualized scores, we can see that, for tokens spanning over
 more multiple frames, e.g. “T” in “THAT, the token-level confidence
@@ -529,7 +526,7 @@ Obtain word-level alignments and confidence scores
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 352-357
+.. GENERATED FROM PYTHON SOURCE LINES 347-352
 
 Now let’s merge the token-level alignments and confidence scores to get
 word-level alignments and confidence scores. Then, finally, we verify
@@ -537,7 +534,7 @@ the quality of word alignments by 1) plotting the word-level alignments
 and the waveform, 2) segmenting the original audio according to the
 alignments and listening to them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 357-386
+.. GENERATED FROM PYTHON SOURCE LINES 352-382
 
 .. code-block:: default
 
@@ -557,7 +554,7 @@ alignments and listening to them.
                         s = len(words)
                     else:
                         s = 0
-                    segs = segments[i1 + s:i2 + s]
+                    segs = segments[i1 + s : i2 + s]
                     word = "".join([seg.label for seg in segs])
                     score = sum(seg.score * seg.length for seg in segs) / sum(seg.length for seg in segs)
                     words.append(Segment(word, segments[i1 + s].start, segments[i2 + s - 1].end, score))
@@ -566,6 +563,7 @@ alignments and listening to them.
                 i2 += 1
             i3 += 1
         return words
+
 
     word_segments = merge_words(transcript, segments, "|")
 
@@ -577,23 +575,24 @@ alignments and listening to them.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-390
+.. GENERATED FROM PYTHON SOURCE LINES 383-386
 
 Visualization
 ^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 390-426
+.. GENERATED FROM PYTHON SOURCE LINES 386-424
 
 .. code-block:: default
 
 
+
     def plot_alignments(segments, word_segments, waveform, input_lengths, scale=10):
         fig, ax2 = plt.subplots(figsize=(64, 12))
-        plt.rcParams.update({'font.size': 30})
+        plt.rcParams.update({"font.size": 30})
 
         # The original waveform
-        ratio = waveform.size(0) / input_lengths
+        ratio = waveform.size(1) / input_lengths
         ax2.plot(waveform)
         ax2.set_ylim(-1.0 * scale, 1.0 * scale)
         ax2.set_xlim(0, waveform.size(-1))
@@ -613,11 +612,12 @@ Visualization
         ax2.set_xlabel("time [second]", fontsize=40)
         ax2.set_yticks([])
 
+
     plot_alignments(
         segments,
         word_segments,
-        waveform[0],
-        emission.shape[0],
+        waveform,
+        emission.shape[1],
         1,
     )
     plt.show()
@@ -635,22 +635,24 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 427-444
+.. GENERATED FROM PYTHON SOURCE LINES 425-444
 
 .. code-block:: default
+
 
 
     # A trick to embed the resulting audio to the generated file.
     # `IPython.display.Audio` has to be the last call in a cell,
     # and there should be only one call par cell.
     def display_segment(i, waveform, word_segments, frame_alignment):
-        ratio = waveform.size(1) / len(frame_alignment)
+        ratio = waveform.size(1) / frame_alignment.size(1)
         word = word_segments[i]
         x0 = int(ratio * word.start)
         x1 = int(ratio * word.end)
         print(f"{word.label} ({word.score:.2f}): {x0 / sample_rate:.3f} - {x1 / sample_rate:.3f} sec")
         segment = waveform[:, x0:x1]
         return IPython.display.Audio(segment.numpy(), rate=sample_rate)
+
 
     # Generate the audio for each segment
     print(transcript)
@@ -960,163 +962,55 @@ Visualization
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 491-505
+.. GENERATED FROM PYTHON SOURCE LINES 491-504
 
-II. Advancd usages
-------------------
+Advanced usage: Dealing with missing transcripts using the <star> token
+---------------------------------------------------------------------------
 
-Aligning non-English data
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Now let’s look at when the transcript is partially missing, how can we
+improve alignment quality using the <star> token, which is capable of modeling
+any token.
 
-Here we show an example of computing forced alignments on a German
-utterance using the multilingual Wav2vec2 model described in the paper
-`“Scaling Speech Technology to 1,000+
-Languages” <https://research.facebook.com/publications/scaling-speech-technology-to-1000-languages/>`__.
-The model was trained on 23K of audio data from 1100+ languages using
-the `“uroman vocabulary” <https://www.isi.edu/~ulf/uroman.html>`__ as
-targets.
+Here we use the same English example as used above. But we remove the
+beginning text “i had that curiosity beside me at” from the transcript.
+Aligning audio with such transcript results in wrong alignments of the
+existing word “this”. However, this issue can be mitigated by using the
+<star> token to model the missing text.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 505-642
+.. GENERATED FROM PYTHON SOURCE LINES 504-534
 
 .. code-block:: default
 
 
-    from torchaudio.models import wav2vec2_model
-
-    model = wav2vec2_model(
-        extractor_mode="layer_norm",
-        extractor_conv_layer_config=[
-            (512, 10, 5),
-            (512, 3, 2),
-            (512, 3, 2),
-            (512, 3, 2),
-            (512, 3, 2),
-            (512, 2, 2),
-            (512, 2, 2),
-        ],
-        extractor_conv_bias=True,
-        encoder_embed_dim=1024,
-        encoder_projection_dropout=0.0,
-        encoder_pos_conv_kernel=128,
-        encoder_pos_conv_groups=16,
-        encoder_num_layers=24,
-        encoder_num_heads=16,
-        encoder_attention_dropout=0.0,
-        encoder_ff_interm_features=4096,
-        encoder_ff_interm_dropout=0.1,
-        encoder_dropout=0.0,
-        encoder_layer_norm_first=True,
-        encoder_layer_drop=0.1,
-        aux_num_out=31,
-    )
-
-    torch.hub.download_url_to_file("https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt", "model.pt")
-    checkpoint = torch.load("model.pt", map_location="cpu")
-
-    model.load_state_dict(checkpoint)
-    model.eval()
-
-
-    waveform, _ = torchaudio.load(SPEECH_FILE)
-
-
-    def get_emission(waveform):
-        # NOTE: this step is essential
-        waveform = torch.nn.functional.layer_norm(waveform, waveform.shape)
-
-        emissions, _ = model(waveform)
+    # Reload the emission tensor in order to add the extra dimension corresponding to the <star> token.
+    with torch.inference_mode():
+        waveform, _ = torchaudio.load(SPEECH_FILE)
+        emissions, _ = model(waveform.to(device))
         emissions = torch.log_softmax(emissions, dim=-1)
-        emission = emissions[0].cpu().detach()
 
         # Append the extra dimension corresponding to the <star> token
         extra_dim = torch.zeros(emissions.shape[0], emissions.shape[1], 1)
-        emissions = torch.cat((emissions, extra_dim), 2)
-        emission = emissions[0].cpu().detach()
-        return emission, waveform
+        emissions = torch.cat((emissions.cpu(), extra_dim), 2)
+        emission = emissions.detach()
 
-    emission, waveform = get_emission(waveform)
+    # Extend the dictionary to include the <star> token.
+    dictionary["*"] = 29
 
-    # Construct the dictionary
-    # '@' represents the OOV token, '*' represents the <star> token.
-    # <pad> and </s> are fairseq's legacy tokens, which're not used.
-    dictionary = {
-        "<blank>": 0,
-        "<pad>": 1,
-        "</s>": 2,
-        "@": 3,
-        "a": 4,
-        "i": 5,
-        "e": 6,
-        "n": 7,
-        "o": 8,
-        "u": 9,
-        "t": 10,
-        "s": 11,
-        "r": 12,
-        "m": 13,
-        "k": 14,
-        "l": 15,
-        "d": 16,
-        "g": 17,
-        "h": 18,
-        "y": 19,
-        "b": 20,
-        "p": 21,
-        "w": 22,
-        "c": 23,
-        "v": 24,
-        "j": 25,
-        "z": 26,
-        "f": 27,
-        "'": 28,
-        "q": 29,
-        "x": 30,
-        "*": 31,
-    }
-    assert len(dictionary) == emission.shape[1]
+    assert len(dictionary) == emission.shape[2]
 
 
     def compute_and_plot_alignments(transcript, dictionary, emission, waveform):
         frames, frame_alignment, _ = compute_alignments(transcript, dictionary, emission)
         segments = merge_repeats(frames, transcript)
-        word_segments = merge_words(transcript, segments)
-        plot_alignments(
-            segments,
-            word_segments,
-            waveform[0],
-            emission.shape[0]
-        )
+        word_segments = merge_words(transcript, segments, "|")
+        plot_alignments(segments, word_segments, waveform, emission.shape[1], 1)
         plt.show()
         return word_segments, frame_alignment
 
-    # One can follow the following steps to download the uroman romanizer and use it to obtain normalized transcripts.
-    # def normalize_uroman(text):
-    #     text = text.lower()
-    #     text = text.replace("’", "'")
-    #     text = re.sub("([^a-z' ])", " ", text)
-    #     text = re.sub(' +', ' ', text)
-    #     return text.strip()
-    #
-    # echo 'aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid' > test.txt"
-    # git clone https://github.com/isi-nlp/uroman
-    # uroman/bin/uroman.pl < test.txt > test_romanized.txt
-    # 
-    # file = "test_romanized.txt"
-    # f = open(file, "r")
-    # lines = f.readlines()
-    # text_normalized = normalize_uroman(lines[0].strip())
 
-
-    text_normalized = "aber seit ich bei ihnen das brot hole brauch ich viel weniger schulze wandte sich ab die kinder taten ihm leid"
-    SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/10349_8674_000087.flac")
-    waveform, _ = torchaudio.load(SPEECH_FILE)
-
-    emission, waveform = get_emission(waveform)
-
-    transcript = text_normalized
+    # original:
     word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
-
 
 
 
@@ -1127,44 +1021,17 @@ targets.
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-      0%|          | 0.00/1.18G [00:00<?, ?B/s]      2%|1         | 21.5M/1.18G [00:00<00:05, 225MB/s]      4%|3         | 43.0M/1.18G [00:00<00:05, 224MB/s]      5%|5         | 64.4M/1.18G [00:00<00:05, 213MB/s]      7%|7         | 89.6M/1.18G [00:00<00:05, 233MB/s]     10%|9         | 115M/1.18G [00:00<00:04, 245MB/s]      12%|#1        | 139M/1.18G [00:00<00:04, 246MB/s]     13%|#3        | 162M/1.18G [00:00<00:04, 247MB/s]     16%|#5        | 190M/1.18G [00:00<00:04, 260MB/s]     18%|#8        | 218M/1.18G [00:00<00:03, 270MB/s]     20%|##        | 245M/1.18G [00:01<00:03, 275MB/s]     23%|##2       | 271M/1.18G [00:01<00:03, 272MB/s]     25%|##4       | 297M/1.18G [00:01<00:03, 269MB/s]     27%|##6       | 324M/1.18G [00:01<00:03, 271MB/s]     29%|##9       | 350M/1.18G [00:01<00:03, 273MB/s]     31%|###1      | 376M/1.18G [00:01<00:03, 259MB/s]     33%|###3      | 401M/1.18G [00:01<00:03, 259MB/s]     35%|###5      | 427M/1.18G [00:01<00:03, 261MB/s]     38%|###7      | 453M/1.18G [00:01<00:02, 265MB/s]     40%|###9      | 478M/1.18G [00:01<00:02, 263MB/s]     42%|####1     | 503M/1.18G [00:02<00:02, 250MB/s]     44%|####3     | 528M/1.18G [00:02<00:02, 252MB/s]     46%|####5     | 552M/1.18G [00:02<00:02, 251MB/s]     48%|####7     | 577M/1.18G [00:02<00:02, 252MB/s]     50%|####9     | 601M/1.18G [00:02<00:02, 248MB/s]     52%|#####1    | 626M/1.18G [00:02<00:02, 249MB/s]     54%|#####3    | 649M/1.18G [00:02<00:02, 247MB/s]     56%|#####6    | 675M/1.18G [00:02<00:02, 254MB/s]     58%|#####8    | 700M/1.18G [00:02<00:02, 257MB/s]     60%|######    | 725M/1.18G [00:02<00:01, 257MB/s]     62%|######2   | 749M/1.18G [00:03<00:01, 246MB/s]     64%|######4   | 773M/1.18G [00:03<00:01, 239MB/s]     66%|######6   | 799M/1.18G [00:03<00:01, 248MB/s]     68%|######8   | 822M/1.18G [00:03<00:01, 236MB/s]     70%|#######   | 847M/1.18G [00:03<00:01, 243MB/s]     72%|#######2  | 871M/1.18G [00:03<00:01, 246MB/s]     74%|#######4  | 895M/1.18G [00:03<00:01, 245MB/s]     76%|#######6  | 918M/1.18G [00:03<00:01, 229MB/s]     78%|#######8  | 940M/1.18G [00:03<00:01, 230MB/s]     80%|#######9  | 962M/1.18G [00:04<00:01, 223MB/s]     82%|########1 | 985M/1.18G [00:04<00:01, 226MB/s]     84%|########3 | 0.98G/1.18G [00:04<00:00, 227MB/s]     85%|########5 | 1.00G/1.18G [00:04<00:00, 227MB/s]     88%|########7 | 1.03G/1.18G [00:04<00:00, 237MB/s]     90%|########9 | 1.05G/1.18G [00:04<00:00, 243MB/s]     92%|#########1| 1.08G/1.18G [00:04<00:00, 252MB/s]     94%|#########3| 1.10G/1.18G [00:04<00:00, 256MB/s]     96%|#########5| 1.13G/1.18G [00:04<00:00, 257MB/s]     98%|#########8| 1.15G/1.18G [00:04<00:00, 261MB/s]    100%|##########| 1.18G/1.18G [00:05<00:00, 250MB/s]
-      0%|          | 0.00/140k [00:00<?, ?B/s]    100%|##########| 140k/140k [00:00<00:00, 86.7MB/s]
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 643-658
-
-Dealing with missing transcripts using the <star> token
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Now let’s look at when the transcript is partially missing, how can we
-improve alignment quality using the <star> token, which is capable of modeling
-any token. Note that in the above section, we have manually added the
-token to the vocabualry and the emission matrix.
-
-Here we use the same English example as used above. But we remove the
-beginning text “i had that curiosity beside me at” from the transcript.
-Aligning audio with such transcript results in wrong alignments of the
-existing word “this”. Using the OOV token “@” to model the missing text
-doesn’t help (still resulting in wrong alignments for “this”). However,
-this issue can be mitigated by using a <star> token to model the missing text.
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 658-666
+.. GENERATED FROM PYTHON SOURCE LINES 535-541
 
 .. code-block:: default
 
 
-    SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-    waveform, _ = torchaudio.load(SPEECH_FILE)
-    emission, waveform = get_emission(waveform)
-    transcript = "i had that curiosity beside me at this moment"
-    # original:
+    # Demonstrate the effect of <star> token for dealing with deletion errors
+    # ("i had that curiosity beside me at" missing from the transcript):
+    transcript = "THIS|MOMENT"
     word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
 
 
@@ -1179,15 +1046,15 @@ this issue can be mitigated by using a <star> token to model the missing text.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 667-673
+.. GENERATED FROM PYTHON SOURCE LINES 542-548
 
 .. code-block:: default
 
 
-    # Demonstrate the effect of <star> token for dealing with deletion errors
-    # ("i had that curiosity beside me at" missing from the transcript):
-    transcript = "this moment"
+    # Replacing the missing transcript with the <star> token:
+    transcript = "*|THIS|MOMENT"
     word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
+
 
 
 
@@ -1201,62 +1068,18 @@ this issue can be mitigated by using a <star> token to model the missing text.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 674-679
-
-.. code-block:: default
-
-
-    # Replacing the missing transcript with the OOV token "@":
-    transcript = "@ this moment"
-    word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
-
-
-
-
-.. image-sg:: /tutorials/images/sphx_glr_ctc_forced_alignment_api_tutorial_007.png
-   :alt: ctc forced alignment api tutorial
-   :srcset: /tutorials/images/sphx_glr_ctc_forced_alignment_api_tutorial_007.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 680-686
-
-.. code-block:: default
-
-
-    # Replacing the missing transcript with the <star> token:
-    transcript = "* this moment"
-    word_segments, frame_alignment = compute_and_plot_alignments(transcript, dictionary, emission, waveform)
-
-
-
-
-
-.. image-sg:: /tutorials/images/sphx_glr_ctc_forced_alignment_api_tutorial_008.png
-   :alt: ctc forced alignment api tutorial
-   :srcset: /tutorials/images/sphx_glr_ctc_forced_alignment_api_tutorial_008.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 687-696
+.. GENERATED FROM PYTHON SOURCE LINES 549-557
 
 Conclusion
 ----------
 
 In this tutorial, we looked at how to use torchaudio’s forced alignment
-API and Wav2Vec2 pre-trained acoustic model to align and segment audio
-files, and demonstrated two advanced usages: 1) Inference on non-English data
-2) How introducing a <star> token could improve alignment accuracy when
+API to align and segment speech files, and demonstrated one advanced usage:
+How introducing a <star> token could improve alignment accuracy when
 transcription errors exist.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 699-707
+.. GENERATED FROM PYTHON SOURCE LINES 560-568
 
 Acknowledgement
 ---------------
@@ -1270,7 +1093,7 @@ visualization utilities.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.410 seconds)
+   **Total running time of the script:** ( 1 minutes  54.592 seconds)
 
 
 .. _sphx_glr_download_tutorials_ctc_forced_alignment_api_tutorial.py:

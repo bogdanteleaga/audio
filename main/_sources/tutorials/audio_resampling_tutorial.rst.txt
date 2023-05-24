@@ -46,8 +46,8 @@ This tutorial shows how to use torchaudio's resampling API.
 
  .. code-block:: none
 
-    2.1.0.dev20230523
-    2.1.0.dev20230524
+    2.1.0.dev20230711
+    2.1.0.dev20230711
 
 
 
@@ -69,14 +69,14 @@ First, we import the modules and define the helper functions.
     import timeit
 
     import librosa
-    import resampy
-    import matplotlib.pyplot as plt
     import matplotlib.colors as mcolors
+    import matplotlib.pyplot as plt
     import pandas as pd
-    from IPython.display import Audio, display
+    import resampy
+    from IPython.display import Audio
 
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.max_columns", None)
 
     DEFAULT_OFFSET = 201
 
@@ -658,16 +658,17 @@ in ``torchaudio``.
 
  .. code-block:: none
 
-    torchaudio: 2.1.0.dev20230524
+    torchaudio: 2.1.0.dev20230711
     librosa: 0.10.0
     resampy: 0.2.2
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-369
+.. GENERATED FROM PYTHON SOURCE LINES 340-374
 
 .. code-block:: default
+
 
 
     def benchmark_resample_functional(
@@ -680,8 +681,9 @@ in ``torchaudio``.
         beta=None,
         iters=5,
     ):
-        return timeit.timeit(
-            stmt='''
+        return (
+            timeit.timeit(
+                stmt="""
     torchaudio.functional.resample(
         waveform,
         sample_rate,
@@ -691,11 +693,14 @@ in ``torchaudio``.
         resampling_method=resampling_method,
         beta=beta,
     )
-            ''',
-            setup='import torchaudio',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                setup="import torchaudio",
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -705,9 +710,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 371-403
+.. GENERATED FROM PYTHON SOURCE LINES 376-413
 
 .. code-block:: default
+
 
 
     def benchmark_resample_transforms(
@@ -720,9 +726,10 @@ in ``torchaudio``.
         beta=None,
         iters=5,
     ):
-        return timeit.timeit(
-            stmt='resampler(waveform)',
-            setup='''
+        return (
+            timeit.timeit(
+                stmt="resampler(waveform)",
+                setup="""
     import torchaudio
 
     resampler = torchaudio.transforms.Resample(
@@ -735,10 +742,13 @@ in ``torchaudio``.
         beta=beta,
     )
     resampler.to(waveform.device)
-            ''',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -748,9 +758,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 405-429
+.. GENERATED FROM PYTHON SOURCE LINES 415-444
 
 .. code-block:: default
+
 
 
     def benchmark_resample_librosa(
@@ -761,19 +772,23 @@ in ``torchaudio``.
         iters=5,
     ):
         waveform_np = waveform.squeeze().numpy()
-        return timeit.timeit(
-            stmt='''
+        return (
+            timeit.timeit(
+                stmt="""
     librosa.resample(
         waveform_np,
         orig_sr=sample_rate,
         target_sr=resample_rate,
         res_type=res_type,
     )
-            ''',
-            setup='import librosa',
-            number=iters,
-            globals=locals(),
-        ) * 1000 / iters
+            """,
+                setup="import librosa",
+                number=iters,
+                globals=locals(),
+            )
+            * 1000
+            / iters
+        )
 
 
 
@@ -783,9 +798,10 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 431-480
+.. GENERATED FROM PYTHON SOURCE LINES 446-496
 
 .. code-block:: default
+
 
 
     def benchmark(sample_rate, resample_rate):
@@ -843,7 +859,7 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-492
+.. GENERATED FROM PYTHON SOURCE LINES 498-508
 
 .. code-block:: default
 
@@ -851,7 +867,7 @@ in ``torchaudio``.
         print(df.round(2))
         ax = df.plot(kind="bar")
         plt.ylabel("Time Elapsed [ms]")
-        plt.xticks(rotation = 0, fontsize=10)
+        plt.xticks(rotation=0, fontsize=10)
         for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
             label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
             ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
@@ -864,12 +880,12 @@ in ``torchaudio``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-495
+.. GENERATED FROM PYTHON SOURCE LINES 509-511
 
 Downsample (48 -> 44.1 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 496-500
+.. GENERATED FROM PYTHON SOURCE LINES 512-516
 
 .. code-block:: default
 
@@ -891,20 +907,20 @@ Downsample (48 -> 44.1 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.81        0.35
-    sinc (width 16)      NaN        0.67        0.31
-    kaiser_best        80.54        1.19        0.36
-    kaiser_fast         8.13        0.93        0.32
+    sinc (width 64)      NaN        0.81        0.34
+    sinc (width 16)      NaN        0.68        0.29
+    kaiser_best        80.77        1.18        0.34
+    kaiser_fast         8.12        0.91        0.30
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 501-503
+.. GENERATED FROM PYTHON SOURCE LINES 517-519
 
 Downsample (16 -> 8 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 504-508
+.. GENERATED FROM PYTHON SOURCE LINES 520-524
 
 .. code-block:: default
 
@@ -926,20 +942,20 @@ Downsample (16 -> 8 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        1.29        1.09
-    sinc (width 16)      NaN        0.47        0.35
-    kaiser_best        11.55        1.34        1.13
-    kaiser_fast         3.39        0.54        0.37
+    sinc (width 64)      NaN        1.27        1.08
+    sinc (width 16)      NaN        0.48        0.33
+    kaiser_best        11.49        1.35        1.13
+    kaiser_fast         3.37        0.55        0.37
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 509-511
+.. GENERATED FROM PYTHON SOURCE LINES 525-527
 
 Upsample (44.1 -> 48 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 512-516
+.. GENERATED FROM PYTHON SOURCE LINES 528-532
 
 .. code-block:: default
 
@@ -961,20 +977,20 @@ Upsample (44.1 -> 48 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.81        0.33
-    sinc (width 16)      NaN        0.66        0.29
-    kaiser_best        32.86        1.05        0.33
-    kaiser_fast         8.10        0.91        0.29
+    sinc (width 64)      NaN        0.78        0.32
+    sinc (width 16)      NaN        0.67        0.29
+    kaiser_best        32.73        1.05        0.32
+    kaiser_fast         8.10        0.90        0.29
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 517-519
+.. GENERATED FROM PYTHON SOURCE LINES 533-535
 
 Upsample (8 -> 16 kHz)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 520-524
+.. GENERATED FROM PYTHON SOURCE LINES 536-540
 
 .. code-block:: default
 
@@ -996,15 +1012,15 @@ Upsample (8 -> 16 kHz)
  .. code-block:: none
 
                      librosa  functional  transforms
-    sinc (width 64)      NaN        0.63        0.45
-    sinc (width 16)      NaN        0.32        0.18
-    kaiser_best        11.44        0.66        0.46
-    kaiser_fast         3.24        0.38        0.19
+    sinc (width 64)      NaN        0.62        0.41
+    sinc (width 16)      NaN        0.34        0.18
+    kaiser_best        11.45        0.62        0.43
+    kaiser_fast         3.19        0.37        0.19
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 525-539
+.. GENERATED FROM PYTHON SOURCE LINES 541-555
 
 Summary
 ~~~~~~~
@@ -1024,7 +1040,7 @@ To elaborate on the results:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.307 seconds)
+   **Total running time of the script:** ( 0 minutes  3.511 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_resampling_tutorial.py:

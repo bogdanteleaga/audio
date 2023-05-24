@@ -36,21 +36,24 @@ play audio and video.
    The tutorial was written and tested on MacBook Pro (M1, 2020).
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-34
+.. GENERATED FROM PYTHON SOURCE LINES 23-37
 
 .. note::
 
-   This tutorial requires FFmpeg libraries (>=5.0, <6).
+   This tutorial requires torchaudio nightly build and FFmpeg libraries (>=4.1, <4.4).
+
+   To install torchaudio nightly build, please refer to
+   https://pytorch.org/get-started/locally/ .
+
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install -c conda-forge 'ffmpeg<6'`` will install
-   the required libraries.
-   This distribution, however, does not have SDL plugin, so
-   it cannot play video.
+   ``conda install 'ffmpeg<4.4'`` will install the required FFmpeg libraries,
+   however, this distribution does not have SDL plugin, so it cannot play
+   video.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-53
+.. GENERATED FROM PYTHON SOURCE LINES 40-56
 
 .. warning::
 
@@ -69,12 +72,12 @@ play audio and video.
       ffmpeg -devices
       ffmpeg -protocols
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-58
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 Preparation
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-68
+.. GENERATED FROM PYTHON SOURCE LINES 62-71
 
 .. code-block:: default
 
@@ -88,7 +91,7 @@ Preparation
     from torchaudio.io import StreamWriter
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-76
+.. GENERATED FROM PYTHON SOURCE LINES 73-81
 
 .. code-block:: default
 
@@ -96,10 +99,12 @@ Preparation
     from torchaudio.utils import download_asset
 
     AUDIO_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-    VIDEO_PATH = download_asset("tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4")
+    VIDEO_PATH = download_asset(
+        "tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4"
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-112
+.. GENERATED FROM PYTHON SOURCE LINES 82-117
 
 Device Availability
 -------------------
@@ -137,7 +142,7 @@ For details about what devices are available on which OS, please check
 the official FFmpeg documentation. https://ffmpeg.org/ffmpeg-devices.html
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-121
+.. GENERATED FROM PYTHON SOURCE LINES 120-126
 
 Playing audio
 -------------
@@ -146,7 +151,7 @@ By providing ``format="audiotoolbox"`` option, the StreamWriter writes
 data to speaker device.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-127
+.. GENERATED FROM PYTHON SOURCE LINES 127-132
 
 .. code-block:: default
 
@@ -156,7 +161,7 @@ data to speaker device.
     num_frames, num_channels = waveform.shape
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-134
+.. GENERATED FROM PYTHON SOURCE LINES 134-139
 
 .. code-block:: default
 
@@ -166,7 +171,7 @@ data to speaker device.
     s.add_audio_stream(sample_rate, num_channels, format="s16")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-142
+.. GENERATED FROM PYTHON SOURCE LINES 141-147
 
 .. code-block:: default
 
@@ -174,10 +179,10 @@ data to speaker device.
     # Write audio to the device
     with s.open():
         for i in range(0, num_frames, 256):
-            s.write_audio_chunk(0, waveform[i:i+256])
+            s.write_audio_chunk(0, waveform[i : i + 256])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-159
+.. GENERATED FROM PYTHON SOURCE LINES 148-164
 
 .. note::
 
@@ -196,7 +201,7 @@ data to speaker device.
           s.write_audio_chunk(0, waveform)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-171
+.. GENERATED FROM PYTHON SOURCE LINES 167-176
 
 Playing Video
 -------------
@@ -208,7 +213,7 @@ enabled. The available devices can be checked with ``ffmpeg -devices``.
 Here, we use SDL device (https://ffmpeg.org/ffmpeg-devices.html#sdl).
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-180
+.. GENERATED FROM PYTHON SOURCE LINES 177-185
 
 .. code-block:: default
 
@@ -221,19 +226,23 @@ Here, we use SDL device (https://ffmpeg.org/ffmpeg-devices.html#sdl).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-183
+.. GENERATED FROM PYTHON SOURCE LINES 186-188
 
 For we define a helper function that delegates the video loading to
 a background thread and give chunks
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-214
+.. GENERATED FROM PYTHON SOURCE LINES 189-223
 
 .. code-block:: default
 
 
     running = True
+
+
     def video_streamer(path, frames_per_chunk):
-        import queue, threading
+        import queue
+        import threading
+
         from torchaudio.io import StreamReader
 
         q = queue.Queue()
@@ -242,9 +251,9 @@ a background thread and give chunks
         def _streamer():
             streamer = StreamReader(path)
             streamer.add_basic_video_stream(
-                frames_per_chunk, format="rgb24",
-                frame_rate=frame_rate, width=width, height=height)
-            for (chunk_, ) in streamer.stream():
+                frames_per_chunk, format="rgb24", frame_rate=frame_rate, width=width, height=height
+            )
+            for (chunk_,) in streamer.stream():
                 q.put(chunk_)
                 if not running:
                     break
@@ -261,7 +270,7 @@ a background thread and give chunks
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-221
+.. GENERATED FROM PYTHON SOURCE LINES 224-230
 
 Now we start streaming. Pressing "Q" will stop the video.
 
@@ -270,7 +279,7 @@ Now we start streaming. Pressing "Q" will stop the video.
    `write_video_chunk` call against SDL device blocks until SDL finishes
    playing the video.
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-238
+.. GENERATED FROM PYTHON SOURCE LINES 231-247
 
 .. code-block:: default
 
@@ -291,7 +300,7 @@ Now we start streaming. Pressing "Q" will stop the video.
                 break
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-247
+.. GENERATED FROM PYTHON SOURCE LINES 248-256
 
 .. raw:: html
 
@@ -302,7 +311,7 @@ Now we start streaming. Pressing "Q" will stop the video.
 [`code <https://download.pytorch.org/torchaudio/tutorial-assets/sdl.py>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-257
+.. GENERATED FROM PYTHON SOURCE LINES 259-266
 
 Streaming Video
 ---------------
@@ -312,7 +321,7 @@ alternative methods for video streaming.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-293
+.. GENERATED FROM PYTHON SOURCE LINES 269-302
 
 RTMP (Real-Time Messaging Protocol)
 -----------------------------------
@@ -348,7 +357,7 @@ The call to ``open`` is blocked until a request is received.
 [`code <https://download.pytorch.org/torchaudio/tutorial-assets/rtmp.py>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-325
+.. GENERATED FROM PYTHON SOURCE LINES 306-334
 
 UDP (User Datagram Protocol)
 ----------------------------
@@ -379,7 +388,7 @@ The streaming process are not aware of client process.
 [`code <https://download.pytorch.org/torchaudio/tutorial-assets/udp.py>`__]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-329
+.. GENERATED FROM PYTHON SOURCE LINES 337-338
 
 Tag: :obj:`torchaudio.io`
 

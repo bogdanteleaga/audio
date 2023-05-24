@@ -51,8 +51,8 @@ load them into PyTorch Tensors and save PyTorch Tensors.
 
  .. code-block:: none
 
-    2.1.0.dev20230523
-    2.1.0.dev20230524
+    2.1.0.dev20230711
+    2.1.0.dev20230711
 
 
 
@@ -72,7 +72,7 @@ First, we import the modules and download the audio assets we use in this tutori
 
       !pip install boto3
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-67
+.. GENERATED FROM PYTHON SOURCE LINES 38-68
 
 .. code-block:: default
 
@@ -102,6 +102,7 @@ First, we import the modules and download the audio assets we use in this tutori
 
             def read(self, n):
                 return self.obj.read(n)
+
         return _wrapper(obj)
 
 
@@ -113,13 +114,13 @@ First, we import the modules and download the audio assets we use in this tutori
 
  .. code-block:: none
 
-      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 7.72MB/s]
-      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 98.9MB/s]
+      0%|          | 0.00/7.99k [00:00<?, ?B/s]    100%|##########| 7.99k/7.99k [00:00<00:00, 15.8MB/s]
+      0%|          | 0.00/53.2k [00:00<?, ?B/s]    100%|##########| 53.2k/53.2k [00:00<00:00, 91.2MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-74
+.. GENERATED FROM PYTHON SOURCE LINES 69-75
 
 Querying audio metadata
 -----------------------
@@ -128,7 +129,7 @@ Function :py:func:`torchaudio.info` fetches audio metadata.
 You can provide a path-like object or file-like object.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-78
+.. GENERATED FROM PYTHON SOURCE LINES 75-79
 
 .. code-block:: default
 
@@ -149,7 +150,7 @@ You can provide a path-like object or file-like object.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-110
+.. GENERATED FROM PYTHON SOURCE LINES 80-111
 
 Where
 
@@ -183,7 +184,7 @@ Where
 -  ``"UNKNOWN"`` None of above
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-118
+.. GENERATED FROM PYTHON SOURCE LINES 113-119
 
 **Note**
 
@@ -192,7 +193,7 @@ Where
 -  ``num_frames`` can be ``0`` for GSM-FR format.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-123
+.. GENERATED FROM PYTHON SOURCE LINES 119-124
 
 .. code-block:: default
 
@@ -214,7 +215,7 @@ Where
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-129
+.. GENERATED FROM PYTHON SOURCE LINES 125-130
 
 Querying file-like object
 -------------------------
@@ -222,7 +223,7 @@ Querying file-like object
 :py:func:`torchaudio.info` works on file-like objects.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-135
+.. GENERATED FROM PYTHON SOURCE LINES 130-136
 
 .. code-block:: default
 
@@ -245,7 +246,7 @@ Querying file-like object
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-144
+.. GENERATED FROM PYTHON SOURCE LINES 137-145
 
 .. note::
 
@@ -256,7 +257,7 @@ Querying file-like object
    correct metadata, including the format itself. In such case, you
    can pass ``format`` argument to specify the format of the audio.
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-162
+.. GENERATED FROM PYTHON SOURCE LINES 147-163
 
 Loading audio data
 ------------------
@@ -275,7 +276,7 @@ For the list of supported format, please refer to `the torchaudio
 documentation <https://pytorch.org/audio>`__.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-166
+.. GENERATED FROM PYTHON SOURCE LINES 163-167
 
 .. code-block:: default
 
@@ -290,7 +291,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-186
+.. GENERATED FROM PYTHON SOURCE LINES 169-187
 
 .. code-block:: default
 
@@ -319,7 +320,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-191
+.. GENERATED FROM PYTHON SOURCE LINES 189-192
 
 .. code-block:: default
 
@@ -338,7 +339,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-209
+.. GENERATED FROM PYTHON SOURCE LINES 194-210
 
 .. code-block:: default
 
@@ -365,7 +366,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-214
+.. GENERATED FROM PYTHON SOURCE LINES 212-215
 
 .. code-block:: default
 
@@ -384,7 +385,7 @@ documentation <https://pytorch.org/audio>`__.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-218
+.. GENERATED FROM PYTHON SOURCE LINES 217-219
 
 .. code-block:: default
 
@@ -408,7 +409,7 @@ documentation <https://pytorch.org/audio>`__.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-227
+.. GENERATED FROM PYTHON SOURCE LINES 220-228
 
 Loading from file-like object
 -----------------------------
@@ -419,7 +420,7 @@ within and beyond the local file system.
 The following examples illustrate this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-237
+.. GENERATED FROM PYTHON SOURCE LINES 231-238
 
 .. code-block:: default
 
@@ -442,7 +443,7 @@ The following examples illustrate this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-248
+.. GENERATED FROM PYTHON SOURCE LINES 240-249
 
 .. code-block:: default
 
@@ -468,12 +469,12 @@ The following examples illustrate this.
 
  .. code-block:: none
 
-      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 114MB/s]
+      0%|          | 0.00/110k [00:00<?, ?B/s]    100%|##########| 110k/110k [00:00<00:00, 163MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-260
+.. GENERATED FROM PYTHON SOURCE LINES 251-261
 
 .. code-block:: default
 
@@ -499,7 +500,7 @@ The following examples illustrate this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 261-279
+.. GENERATED FROM PYTHON SOURCE LINES 262-280
 
 Tips on slicing
 ---------------
@@ -520,7 +521,7 @@ stop as soon as the necessary amount of data is fetched.
 The following example illustrates this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-304
+.. GENERATED FROM PYTHON SOURCE LINES 280-306
 
 .. code-block:: default
 
@@ -542,7 +543,8 @@ The following example illustrates this.
     print("Fetching until the requested frames are available...")
     with requests.get(url, stream=True) as response:
         waveform2, sample_rate2 = torchaudio.load(
-            _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames)
+            _hide_seek(response.raw), frame_offset=frame_offset, num_frames=num_frames
+        )
         print(f" - Fetched {response.raw.tell()} bytes")
 
     print("Checking the resulting waveform ... ", end="")
@@ -566,7 +568,7 @@ The following example illustrates this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-329
+.. GENERATED FROM PYTHON SOURCE LINES 307-331
 
 Saving audio to file
 --------------------
@@ -593,7 +595,7 @@ in 16-bit signed integer PCM, you can do the following.
    resulting file size but also precision.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 329-333
+.. GENERATED FROM PYTHON SOURCE LINES 331-335
 
 .. code-block:: default
 
@@ -608,9 +610,10 @@ in 16-bit signed integer PCM, you can do the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 335-344
+.. GENERATED FROM PYTHON SOURCE LINES 337-348
 
 .. code-block:: default
+
 
 
     def inspect_file(path):
@@ -628,13 +631,14 @@ in 16-bit signed integer PCM, you can do the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 345-348
+
+.. GENERATED FROM PYTHON SOURCE LINES 349-352
 
 Save without any encoding option.
 The function will pick up the encoding which
 the provided data fit
 
-.. GENERATED FROM PYTHON SOURCE LINES 349-354
+.. GENERATED FROM PYTHON SOURCE LINES 353-358
 
 .. code-block:: default
 
@@ -651,8 +655,9 @@ the provided data fit
 
  .. code-block:: none
 
+    wav None None None ===> wav pcm_s16le None
     ----------
-    Source: /tmp/tmpjecelvdn/save_example_default.wav
+    Source: /tmp/tmp8chbq9q5/save_example_default.wav
     ----------
      - File size: 108878 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -661,12 +666,12 @@ the provided data fit
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 355-357
+.. GENERATED FROM PYTHON SOURCE LINES 359-361
 
 Save as 16-bit signed integer Linear PCM
 The resulting file occupies half the storage but loses precision
 
-.. GENERATED FROM PYTHON SOURCE LINES 358-364
+.. GENERATED FROM PYTHON SOURCE LINES 362-368
 
 .. code-block:: default
 
@@ -684,8 +689,9 @@ The resulting file occupies half the storage but loses precision
 
  .. code-block:: none
 
+    wav None PCM_S 16 ===> wav pcm_s16le None
     ----------
-    Source: /tmp/tmpekusukqy/save_example_PCM_S16.wav
+    Source: /tmp/tmpb1wg81sg/save_example_PCM_S16.wav
     ----------
      - File size: 108878 bytes
      - AudioMetaData(sample_rate=16000, num_frames=54400, num_channels=1, bits_per_sample=16, encoding=PCM_S)
@@ -694,13 +700,13 @@ The resulting file occupies half the storage but loses precision
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 365-368
+.. GENERATED FROM PYTHON SOURCE LINES 369-372
 
 :py:func:`torchaudio.save` can also handle other formats.
 To name a few:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 368-378
+.. GENERATED FROM PYTHON SOURCE LINES 372-382
 
 .. code-block:: default
 
@@ -721,7 +727,7 @@ To name a few:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 380-387
+.. GENERATED FROM PYTHON SOURCE LINES 384-391
 
 .. code-block:: default
 
@@ -740,8 +746,9 @@ To name a few:
 
  .. code-block:: none
 
+    flac flac None None ===> flac None s16
     ----------
-    Source: /tmp/tmpwdaun7u7/save_example.flac
+    Source: /tmp/tmphg73v82c/save_example.flac
     ----------
      - File size: 45264 bytes
      - AudioMetaData(sample_rate=8000, num_frames=27200, num_channels=1, bits_per_sample=16, encoding=FLAC)
@@ -750,7 +757,7 @@ To name a few:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 388-395
+.. GENERATED FROM PYTHON SOURCE LINES 392-399
 
 Saving to file-like object
 --------------------------
@@ -760,7 +767,7 @@ objects. When saving to a file-like object, argument ``format`` is
 required.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 395-405
+.. GENERATED FROM PYTHON SOURCE LINES 399-409
 
 .. code-block:: default
 
@@ -782,6 +789,7 @@ required.
 
  .. code-block:: none
 
+    None wav None None ===> wav pcm_s16le None
     b'RIFFF\xa9\x01\x00WAVEfmt '
 
 
@@ -790,7 +798,7 @@ required.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.715 seconds)
+   **Total running time of the script:** ( 0 minutes  1.973 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_io_tutorial.py:

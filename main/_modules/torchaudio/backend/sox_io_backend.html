@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.sox_io_backend &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
+  <title>torchaudio.backend.sox_io_backend &mdash; Torchaudio 2.1.0.dev20230711 documentation</title>
   
 
   
@@ -210,7 +210,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.1.0.dev20230711 &#x25BC</span></a>
     </div>
     
 
@@ -258,11 +258,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -275,7 +277,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -288,6 +290,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt">Conformer/Emformer RNN-T ASR/VSR/AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -406,12 +409,10 @@
               
   <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">get_buffer_size</span>
 
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
@@ -419,10 +420,6 @@
 <span class="c1"># Note: need to comply TorchScript syntax -- need annotation and no f-string</span>
 <span class="k">def</span> <span class="nf">_fail_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to fetch metadata from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">_fail_info_fileobj</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to fetch metadata from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fileobj</span><span class="p">))</span>
 
 
 <span class="c1"># Note: need to comply TorchScript syntax -- need annotation and no f-string</span>
@@ -437,30 +434,14 @@
     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_fail_load_fileobj</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load audio from </span><span class="si">{</span><span class="n">fileobj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-
 <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_FFMPEG_INITIALIZED</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">torchaudio.io._compat</span> <span class="k">as</span> <span class="nn">_compat</span>
 
     <span class="n">_fallback_info</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">info_audio</span>
-    <span class="n">_fallback_info_fileobj</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">info_audio_fileobj</span>
     <span class="n">_fallback_load</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">load_audio</span>
-    <span class="n">_fallback_load_fileobj</span> <span class="o">=</span> <span class="n">_compat</span><span class="o">.</span><span class="n">load_audio_fileobj</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">_fallback_info</span> <span class="o">=</span> <span class="n">_fail_info</span>
-    <span class="n">_fallback_info_fileobj</span> <span class="o">=</span> <span class="n">_fail_info_fileobj</span>
     <span class="n">_fallback_load</span> <span class="o">=</span> <span class="n">_fail_load</span>
-    <span class="n">_fallback_load_fileobj</span> <span class="o">=</span> <span class="n">_fail_load_fileobj</span>
-
-
-<span class="n">_deprecation_message</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;File-like object support in sox_io backend is deprecated, &quot;</span>
-    <span class="s2">&quot;and will be removed in v2.1. &quot;</span>
-    <span class="s2">&quot;See https://github.com/pytorch/audio/issues/2950 for the detail.&quot;</span>
-    <span class="s2">&quot;Please migrate to the new dispatcher, or use soundfile backend.&quot;</span>
-<span class="p">)</span>
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">fail_if_no_sox</span>
@@ -471,24 +452,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (path-like object or file-like object):</span>
-<span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
-<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
-
-<span class="sd">                  * ``path-like``: file path</span>
-<span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
-<span class="sd">                    which returns byte string of at most ``size`` length.</span>
-
-<span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
-
-<span class="sd">            Note:</span>
-
-<span class="sd">                  * When the input type is file-like object, this function cannot</span>
-<span class="sd">                    get the correct length (``num_samples``) for certain formats,</span>
-<span class="sd">                    such as ``vorbis``.</span>
-<span class="sd">                    In this case, the value of ``num_samples`` is ``0``.</span>
-<span class="sd">                  * This argument is intentionally annotated as ``str`` only due to</span>
-<span class="sd">                    TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (str):</span>
+<span class="sd">            Source of audio data.</span>
 
 <span class="sd">        format (str or None, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
@@ -500,21 +465,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
-            <span class="c1"># Special case for Backward compatibility</span>
-            <span class="c1"># v0.11 -&gt; v0.12, mp3 handling is moved to FFmpeg.</span>
-            <span class="c1"># file-like objects are not necessarily fallback-able</span>
-            <span class="c1"># when they are not seekable.</span>
-            <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
-            <span class="c1"># because internally libsox does not auto-detect the format.</span>
-            <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
-            <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">get_buffer_size</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_deprecation_message</span><span class="p">)</span>
-            <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">_fallback_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;sox_io backend does not support file-like object.&quot;</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -578,18 +529,7 @@
 <span class="sd">       For these formats, this function always returns ``float32`` Tensor with values.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (path-like object or file-like object):</span>
-<span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
-<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
-
-<span class="sd">                  * ``path-like``: file path</span>
-<span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
-<span class="sd">                    which returns byte string of at most ``size`` length.</span>
-
-<span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
-
-<span class="sd">            Note: This argument is intentionally annotated as ``str`` only due to</span>
-<span class="sd">            TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (path-like object): Source of audio data.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int, optional):</span>
@@ -621,39 +561,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>
-            <span class="c1"># Special case for Backward compatibility</span>
-            <span class="c1"># v0.11 -&gt; v0.12, mp3 handling is moved to FFmpeg.</span>
-            <span class="c1"># file-like objects are not necessarily fallback-able</span>
-            <span class="c1"># when they are not seekable.</span>
-            <span class="c1"># The previous libsox-based implementation required `format=&quot;mp3&quot;`</span>
-            <span class="c1"># because internally libsox does not auto-detect the format.</span>
-            <span class="c1"># For the special BC for mp3, we handle mp3 differently.</span>
-            <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">get_buffer_size</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;mp3&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span>
-                    <span class="n">filepath</span><span class="p">,</span>
-                    <span class="n">frame_offset</span><span class="p">,</span>
-                    <span class="n">num_frames</span><span class="p">,</span>
-                    <span class="n">normalize</span><span class="p">,</span>
-                    <span class="n">channels_first</span><span class="p">,</span>
-                    <span class="nb">format</span><span class="p">,</span>
-                    <span class="n">buffer_size</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_deprecation_message</span><span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
-                <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">ret</span>
-            <span class="k">return</span> <span class="n">_fallback_load_fileobj</span><span class="p">(</span>
-                <span class="n">filepath</span><span class="p">,</span>
-                <span class="n">frame_offset</span><span class="p">,</span>
-                <span class="n">num_frames</span><span class="p">,</span>
-                <span class="n">normalize</span><span class="p">,</span>
-                <span class="n">channels_first</span><span class="p">,</span>
-                <span class="nb">format</span><span class="p">,</span>
-                <span class="n">buffer_size</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;sox_io backend does not support file-like object.&quot;</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span>
@@ -677,9 +585,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path): Path to save file.</span>
-<span class="sd">            This function also handles ``pathlib.Path`` objects, but is annotated</span>
-<span class="sd">            as ``str`` for TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (path-like object): Path to save file.</span>
 <span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
 <span class="sd">        channels_first (bool, optional): If ``True``, the given tensor is interpreted as `[channel, time]`,</span>
@@ -820,18 +726,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">_deprecation_message</span><span class="p">)</span>
-            <span class="n">torchaudio</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">_torchaudio_sox</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
-                <span class="n">filepath</span><span class="p">,</span>
-                <span class="n">src</span><span class="p">,</span>
-                <span class="n">sample_rate</span><span class="p">,</span>
-                <span class="n">channels_first</span><span class="p">,</span>
-                <span class="n">compression</span><span class="p">,</span>
-                <span class="nb">format</span><span class="p">,</span>
-                <span class="n">encoding</span><span class="p">,</span>
-                <span class="n">bits_per_sample</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;sox_io backend does not handle file-like object.&quot;</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span>

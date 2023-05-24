@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.forced_align &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
+  <title>torchaudio.functional.forced_align &mdash; Torchaudio 2.1.0.dev20230711 documentation</title>
   
 
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230711 &#x25BC</span></a>
     </div>
     
 
@@ -261,11 +261,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -278,7 +280,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -291,6 +293,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt">Conformer/Emformer RNN-T ASR/VSR/AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -423,12 +426,12 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>log_probs</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – log probability of CTC emission output.
-Tensor of shape <cite>(T, C)</cite>. where <cite>T</cite> is the input length,
+Tensor of shape <cite>(B, T, C)</cite>. where <cite>B</cite> is the batch size, <cite>T</cite> is the input length,
 <cite>C</cite> is the number of characters in alphabet including blank.</p></li>
-<li><p><strong>targets</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Target sequence. Tensor of shape <cite>(L,)</cite>,
+<li><p><strong>targets</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Target sequence. Tensor of shape <cite>(B, L)</cite>,
 where <cite>L</cite> is the target length.</p></li>
-<li><p><strong>input_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the inputs (max value must each be &lt;= <cite>T</cite>). 0-D Tensor (scalar).</p></li>
-<li><p><strong>target_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the targets. 0-D Tensor (scalar).</p></li>
+<li><p><strong>input_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the inputs (max value must each be &lt;= <cite>T</cite>). 1-D Tensor of shape <cite>(B,)</cite>.</p></li>
+<li><p><strong>target_lengths</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Lengths of the targets. 1-D Tensor of shape <cite>(B,)</cite>.</p></li>
 <li><p><strong>blank_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – The index of blank symbol in CTC emission. (Default: 0)</p></li>
 </ul>
 </dd>
@@ -451,10 +454,20 @@ where <cite>L</cite> is the target length.</p></li>
 <p>where <span class="math">\(N_{\text{repeat}}\)</span> is the number of consecutively repeated tokens.
 For example, in str <cite>“aabbc”</cite>, the number of repeats are <cite>2</cite>.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current version only supports <a href="#id1"><span class="problematic" id="id2">``</span></a>batch_size``==1.</p>
+</div>
 <dl>
-<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">forced_align</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__"><img alt="CTC forced alignment API tutorial" src="../_images/sphx_glr_ctc_forced_alignment_api_tutorial_thumb.png" />
+<dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">forced_align</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Forced Alignment with Wav2Vec2" src="../_images/sphx_glr_forced_alignment_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/forced_alignment_tutorial.html#sphx-glr-tutorials-forced-alignment-tutorial-py"><span class="std std-ref">Forced Alignment with Wav2Vec2</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Forced Alignment with Wav2Vec2</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__"><img alt="CTC forced alignment API tutorial" src="../_images/sphx_glr_ctc_forced_alignment_api_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html#sphx-glr-tutorials-ctc-forced-alignment-api-tutorial-py"><span class="std std-ref">CTC forced alignment API tutorial</span></a></p>
   <div class="sphx-glr-thumbnail-title">CTC forced alignment API tutorial</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Xiaohui Zhang &lt;xiaohuizhang@meta.com&gt;`__"><img alt="Forced alignment for multilingual data" src="../_images/sphx_glr_forced_alignment_for_multilingual_data_tutorial_thumb.png" />
+<p><a class="reference internal" href="../tutorials/forced_alignment_for_multilingual_data_tutorial.html#sphx-glr-tutorials-forced-alignment-for-multilingual-data-tutorial-py"><span class="std std-ref">Forced alignment for multilingual data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Forced alignment for multilingual data</div>
 </div></div></dd>
 </dl>
 </dd></dl>

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installing pre-built binaries &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
+  <title>Installing pre-built binaries &mdash; Torchaudio 2.1.0.dev20230711 documentation</title>
   
 
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230711 &#x25BC</span></a>
     </div>
     
 
@@ -261,11 +261,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -278,7 +280,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -291,6 +293,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt">Conformer/Emformer RNN-T ASR/VSR/AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -425,7 +428,7 @@ each of which requires a corresponding PyTorch distribution.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This software was compiled against an unmodified copy of FFmpeg (licensed under <a class="reference external" href="https://github.com/FFmpeg/FFmpeg/blob/0e15444aceca0e78f99f3d67758eb79d11b86599/COPYING.LGPLv2.1">the LGPLv2.1</a>), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded <a class="reference external" href="https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3">here</a>.</p>
+<p>This software was compiled against an unmodified copy of FFmpeg (licensed under <a class="reference external" href="https://github.com/FFmpeg/FFmpeg/blob/a5d2008e2a2360d351798e9abe883d603e231442/COPYING.LGPLv2.1">the LGPLv2.1</a>), with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded <a class="reference external" href="https://github.com/FFmpeg/FFmpeg/releases/tag/n4.1.8">here</a>.</p>
 </div>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h2>
@@ -439,8 +442,8 @@ each of which requires a corresponding PyTorch distribution.</p>
 <ul>
 <li><p><a class="reference external" href="https://ffmpeg.org">FFmpeg</a>.</p>
 <p>Required to use <a class="reference internal" href="io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a> module.
-TorchAudio official binary distributions are compatible with FFmpeg 5.
-If you need to use FFmpeg 6, please build TorchAudio from source.</p>
+TorchAudio official binary distributions are compatible with FFmpeg 4.1 to 4.4.
+If you need to use FFmpeg 5, please build TorchAudio from source.</p>
 </li>
 <li><p><a class="reference external" href="https://pypi.org/project/sentencepiece/">sentencepiece</a></p>
 <p>Required for performing automatic speech recognition with <a class="reference internal" href="pipelines.html#rnnt"><span class="std std-ref">Emformer RNN-T</span></a>.</p>

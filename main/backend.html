@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
+  <title>torchaudio.backend &mdash; Torchaudio 2.1.0.dev20230711 documentation</title>
   
 
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.1.0.dev20230711 &#x25BC</span></a>
     </div>
     
 
@@ -261,11 +261,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -278,7 +280,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -291,6 +293,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt">Conformer/Emformer RNN-T ASR/VSR/AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -504,28 +507,7 @@ The values encoding can take are one of the following:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
-(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
-<blockquote>
-<div><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
-which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
-</ul>
-</div></blockquote>
-<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ul>
-<li><p>When the input type is file-like object, this function cannot
-get the correct length (<code class="docutils literal notranslate"><span class="pre">num_samples</span></code>) for certain formats,
-such as <code class="docutils literal notranslate"><span class="pre">vorbis</span></code>.
-In this case, the value of <code class="docutils literal notranslate"><span class="pre">num_samples</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
-<li><p>This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
-TorchScript compiler compatibility.</p></li>
-</ul>
-</div>
-</p></li>
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Source of audio data.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Override the format detection with the given format.
 Providing the argument might help when libsox can not infer the format
 from header or extension.</p></li>
@@ -594,19 +576,7 @@ support <code class="docutils literal notranslate"><span class="pre">int24</span
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
-(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
-<blockquote>
-<div><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
-which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
-</ul>
-</div></blockquote>
-<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
-<p>Note: This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
-TorchScript compiler compatibility.</p>
-</p></li>
+<li><p><strong>filepath</strong> (<em>path-like object</em>) – Source of audio data.</p></li>
 <li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
 <li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
 starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
@@ -650,9 +620,7 @@ integer type, else <code class="docutils literal notranslate"><span class="pre">
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – Path to save file.
-This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated
-as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
+<li><p><strong>filepath</strong> (<em>path-like object</em>) – Path to save file.</p></li>
 <li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sampling rate</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <cite>[channel, time]</cite>,

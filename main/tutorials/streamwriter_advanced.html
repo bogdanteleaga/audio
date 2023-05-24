@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StreamWriter Advanced Usage &mdash; Torchaudio 2.1.0.dev20230524 documentation</title>
+  <title>StreamWriter Advanced Usage &mdash; Torchaudio 2.1.0.dev20230711 documentation</title>
   
 
   
@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="AudioEffector Usages" href="effector_tutorial.html" />
+    <link rel="next" title="GPU video decoder/encoder" href="../hw_acceleration_tutorial.html" />
     <link rel="prev" title="StreamWriter Basic Usage" href="streamwriter_basic_tutorial.html" />
   <!-- Google Analytics -->
   
@@ -213,7 +213,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230524 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.1.0.dev20230711 &#x25BC</span></a>
     </div>
     
 
@@ -261,11 +261,13 @@
 <li class="toctree-l1"><a class="reference internal" href="streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hw_acceleration_tutorial.html">GPU video decoder/encoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="effector_tutorial.html">AudioEffector Usages</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio Resampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additive_synthesis_tutorial.html">Additive Synthesis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filter_design_tutorial.html">Filter design tutorial</a></li>
@@ -278,7 +280,7 @@
 <li class="toctree-l1"><a class="reference internal" href="asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
 <li class="toctree-l1"><a class="reference internal" href="device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
@@ -291,6 +293,7 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/avsr_rnnt">Conformer/Emformer RNN-T ASR/VSR/AV-ASR</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -449,13 +452,14 @@ different operating systems.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires FFmpeg libraries (&gt;=5.0, &lt;6).</p>
+<p>This tutorial requires torchaudio nightly build and FFmpeg libraries (&gt;=4.1, &lt;4.4).</p>
+<p>To install torchaudio nightly build, please refer to
+<a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a> .</p>
 <p>There are multiple ways to install FFmpeg libraries.
 If you are using Anaconda Python distribution,
-<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">'ffmpeg&lt;6'</span></code> will install
-the required libraries.
-This distribution, however, does not have SDL plugin, so
-it cannot play video.</p>
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">'ffmpeg&lt;4.4'</span></code> will install the required FFmpeg libraries,
+however, this distribution does not have SDL plugin, so it cannot play
+video.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -486,7 +490,9 @@ following commands</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 
 <span class="n">AUDIO_PATH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span><span class="p">)</span>
-<span class="n">VIDEO_PATH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span><span class="p">)</span>
+<span class="n">VIDEO_PATH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span>
+    <span class="s2">&quot;tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4&quot;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -535,7 +541,7 @@ data to speaker device.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write audio to the device</span>
 <span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">256</span><span class="p">])</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">256</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -569,8 +575,12 @@ enabled. The available devices can be checked with <code class="docutils literal
 <p>For we define a helper function that delegates the video loading to
 a background thread and give chunks</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">running</span> <span class="o">=</span> <span class="kc">True</span>
+
+
 <span class="k">def</span> <span class="nf">video_streamer</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">queue</span><span class="o">,</span> <span class="nn">threading</span>
+    <span class="kn">import</span> <span class="nn">queue</span>
+    <span class="kn">import</span> <span class="nn">threading</span>
+
     <span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
 
     <span class="n">q</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/queue.html#queue.Queue" title="queue.Queue" class="sphx-glr-backref-module-queue sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">queue</span><span class="o">.</span><span class="n">Queue</span></a><span class="p">()</span>
@@ -579,9 +589,9 @@ a background thread and give chunks</p>
     <span class="k">def</span> <span class="nf">_streamer</span><span class="p">():</span>
         <span class="n">streamer</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">streamer</span><span class="o">.</span><span class="n">add_basic_video_stream</span><span class="p">(</span>
-            <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">,</span>
-            <span class="n">frame_rate</span><span class="o">=</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">chunk_</span><span class="p">,</span> <span class="p">)</span> <span class="ow">in</span> <span class="n">streamer</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
+            <span class="n">frames_per_chunk</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;rgb24&quot;</span><span class="p">,</span> <span class="n">frame_rate</span><span class="o">=</span><span class="n">frame_rate</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">chunk_</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">streamer</span><span class="o">.</span><span class="n">stream</span><span class="p">():</span>
             <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chunk_</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">running</span><span class="p">:</span>
                 <span class="k">break</span>
@@ -692,7 +702,7 @@ The streaming process are not aware of client process.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="effector_tutorial.html" class="btn btn-neutral float-right" title="AudioEffector Usages" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="../hw_acceleration_tutorial.html" class="btn btn-neutral float-right" title="GPU video decoder/encoder" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="streamwriter_basic_tutorial.html" class="btn btn-neutral" title="StreamWriter Basic Usage" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>

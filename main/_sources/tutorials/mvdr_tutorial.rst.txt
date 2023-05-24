@@ -46,7 +46,7 @@ Steps:
    relative transfer function (RTF) matrix of the reference microphone.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-40
+.. GENERATED FROM PYTHON SOURCE LINES 31-44
 
 .. code-block:: default
 
@@ -59,6 +59,10 @@ Steps:
     print(torchaudio.__version__)
 
 
+    import matplotlib.pyplot as plt
+    import mir_eval
+    from IPython.display import Audio
+
 
 
 
@@ -67,19 +71,19 @@ Steps:
 
  .. code-block:: none
 
-    2.1.0.dev20230523
-    2.1.0.dev20230524
+    2.1.0.dev20230711
+    2.1.0.dev20230711
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-44
+.. GENERATED FROM PYTHON SOURCE LINES 45-48
 
 2. Preparation
 --------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-54
+.. GENERATED FROM PYTHON SOURCE LINES 50-58
 
 2.1. Import the packages
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,7 +94,7 @@ First, we install and import the necessary packages.
 evaluating the speech enhancement performance.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-68
+.. GENERATED FROM PYTHON SOURCE LINES 58-68
 
 .. code-block:: default
 
@@ -102,10 +106,6 @@ evaluating the speech enhancement performance.
 
     from pesq import pesq
     from pystoi import stoi
-    import mir_eval
-
-    import matplotlib.pyplot as plt
-    from IPython.display import Audio
     from torchaudio.utils import download_asset
 
 
@@ -156,8 +156,8 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 268MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 121MB/s]
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 304MB/s]
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 326MB/s]
 
 
 
@@ -857,7 +857,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.811 seconds)
+   **Total running time of the script:** ( 0 minutes  1.905 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

@@ -31,11 +31,11 @@ libavfilter provides.
 
 .. note::
 
-   This tutorial requires FFmpeg libraries (>=5.0, <6).
+   This tutorial requires FFmpeg libraries (>=4.1, <4.4).
 
    There are multiple ways to install FFmpeg libraries.
    If you are using Anaconda Python distribution,
-   ``conda install -c conda-forge 'ffmpeg<6'`` will install
+   ``conda install -c anaconda 'ffmpeg<4.4'`` will install
    the required libraries.
 
 
@@ -78,7 +78,7 @@ Preparation
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-68
+.. GENERATED FROM PYTHON SOURCE LINES 61-75
 
 .. code-block:: default
 
@@ -89,45 +89,8 @@ Preparation
     print(torch.__version__)
     print(torchaudio.__version__)
 
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    2.1.0.dev20230523
-    2.1.0.dev20230524
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 70-96
-
-.. code-block:: default
-
-
-    try:
-        from torchaudio.io import StreamReader
-    except ModuleNotFoundError:
-        try:
-            import google.colab
-
-            print(
-                """
-                To enable running this notebook in Google Colab, install the requisite
-                third party libraries by running the following code:
-
-                !add-apt-repository -y ppa:savoury1/ffmpeg4
-                !apt-get -qq install -y ffmpeg
-                """
-            )
-        except ModuleNotFoundError:
-            pass
-        raise
-
     import matplotlib.pyplot as plt
+    from torchaudio.io import StreamReader
 
     base_url = "https://download.pytorch.org/torchaudio/tutorial-assets"
     AUDIO_URL = f"{base_url}/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav"
@@ -137,10 +100,17 @@ Preparation
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    2.1.0.dev20230711
+    2.1.0.dev20230711
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-120
+
+.. GENERATED FROM PYTHON SOURCE LINES 76-99
 
 Opening the source
 ------------------
@@ -166,7 +136,7 @@ For the other streams, please refer to the
    that `ffmpeg` command can handle it.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-144
+.. GENERATED FROM PYTHON SOURCE LINES 101-123
 
 Local files
 ~~~~~~~~~~~
@@ -191,7 +161,7 @@ This works for image file, video file and video streams.
    StreamReader(src="video.mpeg")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-162
+.. GENERATED FROM PYTHON SOURCE LINES 125-141
 
 Network protocols
 ~~~~~~~~~~~~~~~~~
@@ -210,7 +180,7 @@ You can directly pass a URL as well.
    StreamReader(src="rtmp://example.com:1935/live/app")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-216
+.. GENERATED FROM PYTHON SOURCE LINES 143-195
 
 File-like objects
 ~~~~~~~~~~~~~~~~~
@@ -265,7 +235,7 @@ an error, you can write a wrapper class to mask the ``seek`` method.
    without `seek`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-238
+.. GENERATED FROM PYTHON SOURCE LINES 197-217
 
 Headerless media
 ~~~~~~~~~~~~~~~~
@@ -288,7 +258,7 @@ Such audio can be opened like following.
    StreamReader(src="raw.s2", format="s16le", option={"sample_rate": "16000"})
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-264
+.. GENERATED FROM PYTHON SOURCE LINES 219-243
 
 Checking the source streams
 ---------------------------
@@ -315,13 +285,13 @@ a subclass of `SourceStream`, with additional audio-specific attributes.
 Similarly, if a source stream is video type, then the return type is
 :py:class:`~torchaudio.io.StreamReader.SourceVideoStream`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-269
+.. GENERATED FROM PYTHON SOURCE LINES 245-248
 
 For regular audio formats and still image formats, such as `WAV`
 and `JPEG`, the number of souorce streams is 1.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-274
+.. GENERATED FROM PYTHON SOURCE LINES 248-253
 
 .. code-block:: default
 
@@ -344,13 +314,13 @@ and `JPEG`, the number of souorce streams is 1.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 275-278
+.. GENERATED FROM PYTHON SOURCE LINES 254-257
 
 Container formats and playlist formats may contain multiple streams
 of different media type.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 278-285
+.. GENERATED FROM PYTHON SOURCE LINES 257-264
 
 .. code-block:: default
 
@@ -370,38 +340,38 @@ of different media type.
  .. code-block:: none
 
     The number of source streams: 27
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2177116'}, width=960, height=540, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8001098'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6312875'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '4943747'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3216424'}, width=1280, height=720, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1268994'}, width=768, height=432, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '902298'}, width=640, height=360, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '541052'}, width=480, height=270, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2399619'}, width=960, height=540, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8223601'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6535378'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '5166250'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3438927'}, width=1280, height=720, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1491497'}, width=768, height=432, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1124801'}, width=640, height=360, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '763555'}, width=480, height=270, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2207619'}, width=960, height=540, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8031601'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6343378'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=750899, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '4974250'}, width=1920, height=1080, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=513057, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3246927'}, width=1280, height=720, frame_rate=60.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=185749, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1299497'}, width=768, height=432, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=111939, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '932801'}, width=640, height=360, frame_rate=30.0)
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=59938, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '571555'}, width=480, height=270, frame_rate=30.0)
-    SourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=60076, num_frames=0, bits_per_sample=0, metadata={'comment': 'English', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:14:57.000000Z', 'language': 'en', 'major_brand': 'mp42', 'minor_version': '1'}, sample_rate=48000.0, num_channels=2)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2177116'}, width=960, height=540, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8001098'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6312875'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '4943747'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3216424'}, width=1280, height=720, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1268994'}, width=768, height=432, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '902298'}, width=640, height=360, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '541052'}, width=480, height=270, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2399619'}, width=960, height=540, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8223601'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6535378'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '5166250'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3438927'}, width=1280, height=720, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1491497'}, width=768, height=432, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1124801'}, width=640, height=360, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '763555'}, width=480, height=270, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=350041, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:39.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '2207619'}, width=960, height=540, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1471810, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:42.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '8031601'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=1076143, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:48.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '6343378'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=783546, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:54.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '4974250'}, width=1920, height=1080, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=535363, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:37:59.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '3246927'}, width=1280, height=720, frame_rate=60.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=193825, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:03.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '1299497'}, width=768, height=432, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=116805, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:06.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '932801'}, width=640, height=360, frame_rate=30.0)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=62544, num_frames=0, bits_per_sample=8, metadata={'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T21:38:07.000000Z', 'major_brand': 'mp42', 'minor_version': '1', 'variant_bitrate': '571555'}, width=480, height=270, frame_rate=30.0)
+    SourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=83695, num_frames=0, bits_per_sample=0, metadata={'comment': 'English', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:14:57.000000Z', 'language': 'en', 'major_brand': 'mp42', 'minor_version': '1'}, sample_rate=48000.0, num_channels=2)
     SourceAudioStream(media_type='audio', codec='ac3', codec_long_name='ATSC A/52A (AC-3)', format='fltp', bit_rate=384000, num_frames=0, bits_per_sample=0, metadata={'comment': 'English', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:15:46.000000Z', 'language': 'en', 'major_brand': 'mp42', 'minor_version': '1'}, sample_rate=48000.0, num_channels=6)
-    SourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=192000, num_frames=0, bits_per_sample=0, metadata={'comment': 'English', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:16:17.000000Z', 'language': 'en', 'major_brand': 'mp42', 'minor_version': '1'}, sample_rate=48000.0, num_channels=6)
+    SourceAudioStream(media_type='audio', codec='eac3', codec_long_name='ATSC A/52B (AC-3, E-AC-3)', format='fltp', bit_rate=100150, num_frames=0, bits_per_sample=0, metadata={'comment': 'English', 'compatible_brands': 'mp41mp42isomhlsf', 'creation_time': '2016-12-21T22:16:17.000000Z', 'language': 'en', 'major_brand': 'mp42', 'minor_version': '1'}, sample_rate=48000.0, num_channels=6)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 286-294
+.. GENERATED FROM PYTHON SOURCE LINES 265-273
 
 Configuring output streams
 --------------------------
@@ -412,7 +382,7 @@ you can omit them. Or if you want to apply different preprocessing
 to the same source stream, you can duplicate the source stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 296-308
+.. GENERATED FROM PYTHON SOURCE LINES 275-287
 
 Default streams
 ~~~~~~~~~~~~~~~
@@ -427,7 +397,7 @@ The resulting stream index is exposed via
 :py:attr:`~torchaudio.io.StreamReader.default_video_stream`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 310-353
+.. GENERATED FROM PYTHON SOURCE LINES 289-332
 
 Configuring output streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -473,7 +443,7 @@ For video output stream, the following parameters are available.
 - ``width``, ``height``: Change the image size.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 355-373
+.. GENERATED FROM PYTHON SOURCE LINES 334-352
 
 .. code::
 
@@ -494,7 +464,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 376-399
+.. GENERATED FROM PYTHON SOURCE LINES 355-378
 
 .. code::
 
@@ -520,7 +490,7 @@ For video output stream, the following parameters are available.
    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 402-414
+.. GENERATED FROM PYTHON SOURCE LINES 381-393
 
 You can check the resulting output streams in a similar manner as
 checking the source streams.
@@ -535,7 +505,7 @@ fetches the information about the output streams.
        print(streamer.get_out_stream_info(i))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 417-425
+.. GENERATED FROM PYTHON SOURCE LINES 396-404
 
 If you want to remove an output stream, you can do so with
 :py:meth:`~torchaudio.io.StreamReader.remove_stream` method.
@@ -546,7 +516,7 @@ If you want to remove an output stream, you can do so with
    streamer.remove_stream(0)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 428-453
+.. GENERATED FROM PYTHON SOURCE LINES 407-432
 
 Streaming
 ---------
@@ -574,7 +544,7 @@ It is as simple as a ``for`` loop.
        ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 455-477
+.. GENERATED FROM PYTHON SOURCE LINES 434-456
 
 Example
 -------
@@ -599,7 +569,7 @@ NASA's Media Usage Guidelines: https://www.nasa.gov/multimedia/guidelines/index.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 479-484
+.. GENERATED FROM PYTHON SOURCE LINES 458-463
 
 Opening the source media
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -607,7 +577,7 @@ Opening the source media
 Firstly, let's list the available streams and its properties.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 484-489
+.. GENERATED FROM PYTHON SOURCE LINES 463-468
 
 .. code-block:: default
 
@@ -624,20 +594,20 @@ Firstly, let's list the available streams and its properties.
 
  .. code-block:: none
 
-    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'encoder': 'AVC Coding', 'handler_name': '\x1fMainconcept Video Media Handler', 'language': 'eng', 'vendor_id': '[0][0][0][0]'}, width=1920, height=1080, frame_rate=29.97002997002997)
-    SourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'handler_name': '#Mainconcept MP4 Sound Media Handler', 'language': 'eng', 'vendor_id': '[0][0][0][0]'}, sample_rate=48000.0, num_channels=2)
+    SourceVideoStream(media_type='video', codec='h264', codec_long_name='H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10', format='yuv420p', bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'encoder': 'AVC Coding', 'handler_name': '\x1fMainconcept Video Media Handler', 'language': 'eng'}, width=1920, height=1080, frame_rate=29.97002997002997)
+    SourceAudioStream(media_type='audio', codec='aac', codec_long_name='AAC (Advanced Audio Coding)', format='fltp', bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={'creation_time': '2018-07-24T17:40:48.000000Z', 'handler_name': '#Mainconcept MP4 Sound Media Handler', 'language': 'eng'}, sample_rate=48000.0, num_channels=2)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 490-494
+.. GENERATED FROM PYTHON SOURCE LINES 469-473
 
 Now we configure the output stream.
 
 Configuring ouptut streams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 495-528
+.. GENERATED FROM PYTHON SOURCE LINES 474-507
 
 .. code-block:: default
 
@@ -681,7 +651,7 @@ Configuring ouptut streams
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 529-536
+.. GENERATED FROM PYTHON SOURCE LINES 508-515
 
 .. note::
 
@@ -691,12 +661,12 @@ Configuring ouptut streams
    consistent across output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 538-540
+.. GENERATED FROM PYTHON SOURCE LINES 517-519
 
 Checking the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 540-544
+.. GENERATED FROM PYTHON SOURCE LINES 519-523
 
 .. code-block:: default
 
@@ -720,12 +690,12 @@ Checking the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 545-547
+.. GENERATED FROM PYTHON SOURCE LINES 524-526
 
 Remove the second audio stream.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 547-552
+.. GENERATED FROM PYTHON SOURCE LINES 526-531
 
 .. code-block:: default
 
@@ -749,18 +719,18 @@ Remove the second audio stream.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 553-556
+.. GENERATED FROM PYTHON SOURCE LINES 532-535
 
 Streaming
 ~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 558-560
+.. GENERATED FROM PYTHON SOURCE LINES 537-539
 
 Jump to the 10 second point.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 560-562
+.. GENERATED FROM PYTHON SOURCE LINES 539-541
 
 .. code-block:: default
 
@@ -773,12 +743,12 @@ Jump to the 10 second point.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 563-565
+.. GENERATED FROM PYTHON SOURCE LINES 542-544
 
 Now, let's finally iterate over the output streams.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 566-576
+.. GENERATED FROM PYTHON SOURCE LINES 545-555
 
 .. code-block:: default
 
@@ -799,14 +769,14 @@ Now, let's finally iterate over the output streams.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 577-581
+.. GENERATED FROM PYTHON SOURCE LINES 556-560
 
 For audio stream, the chunk Tensor will be the shape of
 `(frames_per_chunk, num_channels)`, and for video stream,
 it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 581-586
+.. GENERATED FROM PYTHON SOURCE LINES 560-565
 
 .. code-block:: default
 
@@ -830,11 +800,11 @@ it is `(frames_per_chunk, num_color_channels, height, width)`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 587-588
+.. GENERATED FROM PYTHON SOURCE LINES 566-567
 
 Let's visualize what we received.
 
-.. GENERATED FROM PYTHON SOURCE LINES 588-618
+.. GENERATED FROM PYTHON SOURCE LINES 567-597
 
 .. code-block:: default
 
@@ -880,14 +850,14 @@ Let's visualize what we received.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 619-620
+.. GENERATED FROM PYTHON SOURCE LINES 598-599
 
 Tag: :obj:`torchaudio.io`
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.021 seconds)
+   **Total running time of the script:** ( 0 minutes  6.904 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_basic_tutorial.py:
